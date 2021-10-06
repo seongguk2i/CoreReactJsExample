@@ -3,14 +3,12 @@ using CoreReactJsExample2.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 
 namespace CoreReactJsExample2
 {
@@ -26,6 +24,19 @@ namespace CoreReactJsExample2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Enable Cors
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", option => option.AllowAnyOrigin().AllowAnyMethod()
+                    .AllowAnyHeader());
+            });
+
+            //JSON Serializer
+            services.AddControllersWithViews().AddNewtonsoftJson()
+                .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling=Newtonsoft
+                .Json.ReferenceLoopHandling.Ignore)
+                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -41,7 +52,6 @@ namespace CoreReactJsExample2
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
-            services.AddControllersWithViews();
             services.AddRazorPages();
 
             // In production, the React files will be served from this directory
@@ -54,6 +64,8 @@ namespace CoreReactJsExample2
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
