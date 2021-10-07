@@ -8,11 +8,11 @@ namespace CoreReactJsExample2.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DepartmentController : ControllerBase
+    public class EmployeeController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public DepartmentController(IConfiguration configuration)
+        public EmployeeController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -21,7 +21,9 @@ namespace CoreReactJsExample2.Controllers
         public JsonResult Get()
         {
             string query = @"
-                select DepartmentId, DepartmentName from dbo.Department";
+                select EmployeeId, EmployeeName, Department,
+                convert(varchar(10), DateOfJoining, 120) as DateOfJoining,
+                PhotoFileName from dbo.Employee";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("EmployeeAppCon");
             SqlDataReader myReader;
@@ -42,11 +44,18 @@ namespace CoreReactJsExample2.Controllers
         }
 
         [HttpPost]
-        public JsonResult Post(Department dep)
+        public JsonResult Post(Employee emp)
         {
             string query = @"
-                insert into dbo.Department values
-                ('"+dep.DepartmentName+@"')";
+                insert into dbo.Employee 
+                (EmployeeName, Department, DateOfJoining, PhotoFileName)
+                values
+                (
+                    '" + emp.EmployeeName+ @"'
+                    ,'" + emp.Department + @"'
+                    ,'" + emp.DateOfJoining + @"'
+                    ,'" + emp.PhotoFileName+ @"'
+                )";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("EmployeeAppCon");
             SqlDataReader myReader;
@@ -67,12 +76,14 @@ namespace CoreReactJsExample2.Controllers
         }
 
         [HttpPut]
-        public JsonResult Put(Department dep)
+        public JsonResult Put(Employee emp)
         {
             string query = @"
-                update dbo.Department set DepartmentName = 
-                '" + dep.DepartmentName + @"'
-                where DepartmentId = " + dep.DepartmentId + @"
+                update dbo.Employee set 
+                EmployeeName =  '" + emp.EmployeeName + @"'
+                ,Department =  '" + emp.Department + @"'
+                ,DateOfJoining =  '" + emp.DateOfJoining + @"'
+                where EmployeeId = " + emp.EmployeeId + @"
             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("EmployeeAppCon");
@@ -97,8 +108,8 @@ namespace CoreReactJsExample2.Controllers
         public JsonResult Delete(int id)
         {
             string query = @"
-                delete from dbo.Department 
-                where DepartmentId = " + id + @"
+                delete from dbo.Employee 
+                where EmployeeId = " + id + @"
             ";
             DataTable table = new DataTable();
             string sqlDataSource = _configuration.GetConnectionString("EmployeeAppCon");
