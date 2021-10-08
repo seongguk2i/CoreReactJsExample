@@ -79,7 +79,10 @@ namespace CoreReactJsExample2
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider
+            });
             app.UseSpaStaticFiles();
 
             app.UseRouting();
