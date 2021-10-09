@@ -81,7 +81,7 @@ namespace CoreReactJsExample2
             app.UseHttpsRedirection();
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = new PhysicalFileProvider
+                FileProvider = new PhysicalFileProvider 
             });
             app.UseSpaStaticFiles();
 
